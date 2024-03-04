@@ -17,6 +17,7 @@ if __name__ == '__main__':
     ruta_grafico_promedio_tipo = 'output\pregunta3_grafico1.jpg'
     ruta_grafico_promedio_total = 'output\pregunta3_grafico2.jpg'
     ruta_utilizacion_combustibles = 'output\pregunta4_tabla.csv'
+    ruta_prediccion = 'output\Prediccion_bonus.jpg'
 
     #Cargar los DataFrame
     df_recursos = pd.read_excel(ruta_recursos,skiprows=3)
@@ -45,6 +46,9 @@ if __name__ == '__main__':
 
     #Generar tabla de porcentajes de participación de combustible
     funciones.generar_participación_combustibles(df_generacion, ruta_utilizacion_combustibles)
+
+    #Generar modelo de predicción de los precios
+    funciones.generar_modelo_prediccion([df_precios_2022, df_precios_2023], ruta_prediccion)
 
     #Enviar correo
     correos = ['despinalm@unal.edu.co', 'danieldi0102@gmail.com', 'animeigamer@hotmail.com']

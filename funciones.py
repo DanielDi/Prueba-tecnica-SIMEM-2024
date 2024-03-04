@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from correo import *
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 # Primer punto
 def unificar_registros(lista_df_generaciones, ruta_generacion):
@@ -28,7 +29,7 @@ def csv_generacion_diaria(df_recursos, df_generacion, ruta_generacion_agentes):
     horas = list(map(str, range(24)))
     df_generacion['Total Generado'] = df_generacion[horas].sum(axis=1)
 
-    # Hacer match para agregar 'Agente Representante' al df_generacion
+    # Hacer merge para agregar 'Agente Representante' al df_generacion
     df_generacion = pd.merge(df_generacion, df_recursos[['Código SIC', 'Agente Representante']], left_on='Código Recurso', right_on='Código SIC', how='left')
 
     #Agrupar la sumatoria de lo generado por día y por agente 
@@ -141,3 +142,39 @@ def enviar_correo(correos: list[str], asunto: str, rutas: list[str], texto: str)
         correo.enviar_correo()
     except ValueError as error:
         print(error)
+
+#Bonus
+def generar_modelo_prediccion(lista_precios, ruta_prediccion):
+    # Unir DataFrames de precios
+    df_precios = pd.concat(lista_precios, ignore_index=True)
+    df_precios['Fecha'] = df_precios['Fecha'].dt.date
+
+    horas = list(map(str, range(24)))
+    df_precios['Precio Promedio'] = df_precios[horas].mean(axis=1)
+
+    # Tomar fecha y precio promedio únicamente
+    df_precios = df_precios[['Fecha', 'Precio Promedio']]
+
+    # Establecer la columna 'Fecha' como el índice del DataFrame
+    df_precios.set_index('Fecha', inplace=True)
+
+    # Convertir el índice a la fecha
+    df_precios.index = pd.to_datetime(df_precios.index)
+
+    # Crear el modelo SARIMAX
+    modelo_arima = SARIMAX(df_precios['Precio Promedio'], order=(1, 1, 1))
+
+    # Entrenar el modelo con los datos históricos
+    resultado = modelo_arima.fit()
+
+    # Predecir el precio para un periodo futuro
+    df_precios['forecast']=resultado.predict(start=700)
+
+    #Graficar resultados
+    df_precios[['Precio Promedio','forecast']].plot(figsize=(12,8))
+    plt.legend()
+    plt.savefig(ruta_prediccion)
+    plt.show()
+
+    # Imprimir el resumen del modelo
+    print(resultado.summary())
