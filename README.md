@@ -39,9 +39,11 @@ La solución para el punto 5 la encontrará en el archivo "correo.py"
 
 Modelo de predicción
 ---------------------
-```
-           * * *
+Se escoge el modelo SARIMAX (Seasonal AutoRegressive Integrated Moving Average with eXogenous factors) ya que este modelo es recomendable para capturar patrones en las series de tiempo, en este caso el precio promedio diario de Bolsa. 
 
+Después de ejectuar el modelo los resultados son los siguientes:
+
+```
 Tit   = total number of iterations
 Tnf   = total number of function evaluations
 Tnint = total number of segments explored during Cauchy searches
@@ -79,3 +81,5 @@ Heteroskedasticity (H):              11.33   Skew:                            -1
 Prob(H) (two-sided):                  0.00   Kurtosis:                        18.81
 ===================================================================================
 ```
+
+Se observa que con el criterio de Ljung-Box el valor-P es igual a 0.45, y dado que la probabilidad es superior a 0.05, indica que no hay suficiente evidencia para rechazar la hipótesis nula de no autocorrelación en los residuos, pero esto no es suficiente para identificar la confiabilidad del modelo. Se requiere más análisis para determinar esto. 
